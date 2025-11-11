@@ -1,0 +1,1 @@
+goose -env=../../.env up

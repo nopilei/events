@@ -1,0 +1,26 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="core.permissions.checks.UserIsManagerMixin.*" />
+          <option value="apps.requests.models.service_request.ServiceRequest.objects" />
+          <option value="core.permissions.checks.BasePermissionCheckMixin.request" />
+          <option value="core.permissions.checks.UserIsDirectorMixin.*" />
+          <option value="core.permissions.checks.UserIsAdminMixin.*" />
+          <option value="core.permissions.checks.UserIsMemberMixin.*" />
+          <option value="core.permissions.checks.UserIsLawyerMixin.*" />
+          <option value="apps.requests.models.service_request_log.ServiceRequestLog.*" />
+          <option value="apps.users.models.profile.Profile.*" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="SpellCheckingInspection" enabled="false" level="TYPO" enabled_by_default="false">
+      <option name="processCode" value="true" />
+      <option name="processLiterals" value="true" />
+      <option name="processComments" value="true" />
+    </inspection_tool>
+    <inspection_tool class="SqlNoDataSourceInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+  </profile>
+</component>
