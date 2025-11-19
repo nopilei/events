@@ -1,72 +1,31 @@
-import http from 'k6/http';
-import { sleep } from 'k6';
+import http from "k6/http";
 
-// Количество параллельных "процессов"
-export let options = {
-    // можно сделать stages для ступенчатой нагрузки
+export const options = {
   scenarios: {
-        constant_request_rate: {
-            executor: 'constant-arrival-rate',
-            rate: 3000,
-            timeUnit: '1s', // 1000 итераций в секунду, т.е.1000 запросов секунду
-            duration: '1m',
-	    preAllocatedVUs: 500,
-        }
-    }
+    high_rps: {
+      executor: "constant-arrival-rate",
+      rate: 3000,
+      timeUnit: "1s",
+      duration: "30s",
+      preAllocatedVUs: 3000,
+      maxVUs: 5000,
+    },
+  },
 };
 
-const URL = __ENV.TARGET_URL || "http://localhost:8000/events";
+const URL = __ENV.TARGET_URL || "http://109.196.103.36:8000/events";
+const payload = JSON.stringify({
+  event_type: "order_created",
+  data: {
+    id: 1,
+    user_id: 1,
+    product_id: 1,
+    amount: 1,
+  },
+});
 
-// Список типов событий
-const eventTypes = [
-    "UserCreated",
-    "UserUpdated",
-    "OrderCreated",
-];
-
-// Генерация случайного события
-function randomEvent() {
-    const type = eventTypes[Math.floor(Math.random() * eventTypes.length)];
-
-    switch (type) {
-        case "UserCreated":
-            return {
-                event_type: "user_created",
-                data: {
-                    id: Math.floor(Math.random() * 1_000_000),
-                    name: "Test User",
-                }
-            };
-        case "UserUpdated":
-            return {
-                event_type: "user_updated",
-                data: {
-                    id: Math.floor(Math.random() * 1_000_000),
-                    name: "Test User",
-                }
-            };
-
-        case "OrderCreated":
-            return {
-                event_type: "order_created",
-                data: {
-                    id: Math.floor(Math.random() * 1000000),
-                    user_id: Math.floor(Math.random() * 1000000),
-                    product_id: Math.floor(Math.random() * 1000000),
-                    amount: Math.floor(Math.random() * 1000),
-                }
-            };
-    }
-}
-
-// Основная логика нагрузки
 export default function () {
-    const evt = randomEvent();
-
-    const res = http.post(URL, JSON.stringify(evt), {
-        headers: { "Content-Type": "application/json" },
-    });
-
-    // Можно замедлять, чтобы стабилизировать RPS
-    // sleep(0.1);
+  http.post(URL, payload, {
+    headers: { "Content-Type": "application/json" },
+  });
 }
