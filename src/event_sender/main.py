@@ -29,13 +29,10 @@ async def _task():
         async with httpx.AsyncClient() as client:
             response = await client.post(URL, json=event)
             response.raise_for_status()
-            print(f"Status Code: {response.status_code} {os.getpid()}")
-            print("Response JSON:")
-            print(response.json())
 
 
 if __name__ == '__main__':
-    with concurrent.futures.ProcessPoolExecutor() as executor:
+    with concurrent.futures.ProcessPoolExecutor(max_workers=4) as executor:
         executor.map(run_in_process, range(10))
 
     asyncio.run(run_tasks())

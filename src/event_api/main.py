@@ -9,13 +9,18 @@ from src.brokers.providers import get_producer, get_manager
 from src.event_schemas.base import BaseEventData
 from src.event_schemas.registry import events_registry
 
+from prometheus_fastapi_instrumentator import Instrumentator
+
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Event API")
 
+instrumentator = Instrumentator().instrument(app)
+
 
 @app.on_event("startup")
 async def startup_event():
+    instrumentator.expose(app)
     await get_manager().start_producer()
     logger.info("producer started")
 
