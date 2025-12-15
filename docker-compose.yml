@@ -54,7 +54,7 @@ services:
   api:
     build:
       context: .
-      dockerfile: src/event_api/Dockerfile
+      dockerfile: src/cmd/event_api/Dockerfile
     env_file: .env
     ports:
       - "8000:8000"
@@ -69,7 +69,6 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
-    command: bash run.sh
 
 #  sender:
 #    build:

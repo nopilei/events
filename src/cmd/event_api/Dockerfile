@@ -1,8 +1,8 @@
-FROM python:3.11-slim
+FROM golang:1.25
 
-RUN apt-get update && apt-get install -qq --no-install-recommends curl
-COPY requirements.txt /
+COPY . /app
+WORKDIR /app
+RUN go mod download
+WORKDIR /app/src/cmd/event_api
 
-RUN pip install -r requirements.txt
-
-WORKDIR /app/src/event_api
+CMD [ "bash", "run.sh" ]
