@@ -6,7 +6,6 @@
 // from src.event_schemas.base import BaseEventData
 // from src.event_schemas.registry import events_registry
 
-
 // class KafkaProducer(AsyncProducer):
 //     def __init__(self, producer: AIOKafkaProducer):
 //         self.producer = producer
@@ -19,11 +18,56 @@
 //         except Exception as exc:
 //             raise BrokerError from exc
 
-//     def get_topic_name(self, event: BaseEventData) -> str:
-//         event_type = events_registry[event.event_type]
-//         return topics.get(event_type, event.event_type)
+// def get_topic_name(self, event: BaseEventData) -> str:
+//
+//	event_type = events_registry[event.event_type]
+//	return topics.get(event_type, event.event_type)
 package kafka
 
-type Producer struct{
-    
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"time"
+
+	"github.com/nopilei/events/src/schema"
+	kafkago "github.com/segmentio/kafka-go"
+)
+
+type KafkaProducer struct {
+	writer      *kafkago.Writer
+}
+
+func (producer *KafkaProducer) Send(ctx context.Context, data schema.Event, timeout time.Duration) error{
+    eventType := data.EventType()
+    topic, ok := Topics[eventType]
+    if !ok{
+        return UnknownEventTypeError
+    }
+
+    rawData, err := json.Marshal(data)
+    if err != nil{
+        return errors.Join(MarshalError, err) 
+    }
+    kafkaMessage := kafkago.Message{
+        Topic: topic,
+        Value: rawData,
+    }
+
+    ctx, cancel := context.WithTimeout(ctx, timeout)
+    defer cancel()
+    return producer.writer.WriteMessages(ctx, kafkaMessage)
+}
+
+func New() (*KafkaProducer, error)  {
+    settings, err := LoadKafkaSettings()
+    if err != nil{
+        return nil, err
+    }
+    return &KafkaProducer{
+        writer: &kafkago.Writer{
+            Addr: kafkago.TCP(settings.Brokers...),
+            BatchTimeout: settings.BatchTimeout,
+        },
+    }, nil
 }

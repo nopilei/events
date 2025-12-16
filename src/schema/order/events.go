@@ -18,3 +18,7 @@ type OrderCreated struct {
 	ProductId int `json:"product_id" validate:"required"`
 	Amount    int `json:"amount" validate:"required"`
 }
+func (event *OrderCreated) EventType () string{
+	return "order_created"
+}
+

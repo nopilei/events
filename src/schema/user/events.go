@@ -19,8 +19,14 @@ type UserCreated struct {
 	Id   int `json:"id" validate:"required"`
 	Name string `json:"name" validate:"required"`
 }
+func (event *UserCreated) EventType () string{
+	return "user_created"
+}
 
 type UserUpdated struct {
 	Id   int `json:"id" validate:"required"`
 	Name string `json:"name" validate:"required"`
+}
+func (event *UserUpdated) EventType () string{
+	return "user_updated"
 }

@@ -16,7 +16,9 @@ import (
 //	| order_registry
 //
 // )
-type Event interface{}
+type Event interface{
+	EventType() string
+}
 
 var EventsRegistry = map[string]func() Event{
 	"user_created":  func() Event { return &user.UserCreated{} },
