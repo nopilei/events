@@ -38,8 +38,8 @@ type KafkaProducer struct {
 	writer      *kafkago.Writer
 }
 
-func (producer *KafkaProducer) Send(ctx context.Context, data schema.Event, timeout time.Duration) error{
-    eventType := data.EventType()
+func (producer *KafkaProducer) Send(ctx context.Context, data *schema.BaseEventData, timeout time.Duration) error{
+    eventType := data.EventType
     topic, ok := Topics[eventType]
     if !ok{
         return UnknownEventTypeError

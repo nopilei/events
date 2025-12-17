@@ -11,6 +11,8 @@ import (
 	jsonvalidator "github.com/go-playground/validator/v10"
 	"github.com/nopilei/events/src/schema"
 	"github.com/nopilei/events/src/transport/kafka"
+	"github.com/prometheus/client_golang/prometheus"
+    "github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type ErrorResponse struct {
@@ -19,6 +21,15 @@ type ErrorResponse struct {
 
 var validator *jsonvalidator.Validate = jsonvalidator.New()
 var producer *kafka.KafkaProducer
+var (
+    httpRequests = prometheus.NewCounterVec(
+        prometheus.CounterOpts{
+            Name: "http_requests_total",
+            Help: "Total number of HTTP requests",
+        },
+        []string{"method", "path", "status"},
+    )
+)
 
 func writeJSONError(w http.ResponseWriter, msg string, err error) {
 	fmt.Println(err)
@@ -57,16 +68,23 @@ func sendEvent(w http.ResponseWriter, r *http.Request) {
 		writeJSONError(w, "Producer wasn't initialized", errors.New("Producer wasn't initialized"))
 		return
 	}
-	if err := producer.Send(r.Context(), eventInstance, time.Second); err != nil{
+	if err := producer.Send(r.Context(), event, 5 * time.Second); err != nil{
 		writeJSONError(w, "Message wasn't send.", err)
 		return
 	}
 	
-	fmt.Fprintln(w, "Event received:", eventInstance)
+	httpRequests.WithLabelValues(r.Method, r.Pattern, "200").Inc()
+	fmt.Fprintln(w, "Event received:", event)
 
 }
 
+func healthCheck(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte(`{status: "healthy"}`))
+}
+
 func main() {
+	prometheus.MustRegister(httpRequests)
+
 	port := os.Getenv("API_PORT")
 	if port == "" {
 		port = "8000"
@@ -80,6 +98,8 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /events", sendEvent)
+	mux.HandleFunc("GET /health", healthCheck)
+	mux.Handle("GET /metrics", promhttp.Handler())
 
 	fmt.Println("starting server at", port)
 	err = http.ListenAndServe(":"+port, mux)
