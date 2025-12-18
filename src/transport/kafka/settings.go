@@ -16,6 +16,7 @@ var Topics = map[string]string{
 type KafkaSettings struct {
 	Brokers []string
 	BatchTimeout time.Duration
+	BatchSize int
 }
 
 func LoadKafkaSettings() (KafkaSettings, error) {
@@ -26,6 +27,8 @@ func LoadKafkaSettings() (KafkaSettings, error) {
 
 	return KafkaSettings{
 		Brokers: strings.Split(brokers, ","),
-		BatchTimeout: 500 * time.Millisecond,
+		BatchTimeout: 100 * time.Millisecond,
+		BatchSize: 1000,
+		
 	}, nil
 }
