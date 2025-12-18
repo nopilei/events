@@ -4,9 +4,9 @@ export const options = {
   scenarios: {
     high_rps: {
       executor: "constant-arrival-rate",
-      rate: 400,
+      rate: 1000,
       timeUnit: "1s",
-      duration: "2m",
+      duration: "1m",
       preAllocatedVUs: 500,
       maxVUs: 2000,
     },
@@ -27,6 +27,6 @@ const payload = JSON.stringify({
 export default function () {
   http.post(URL, payload, {
     headers: { "Content-Type": "application/json" },
-    timeout: '200ms',
+    timeout: '500ms',
   });
 }
