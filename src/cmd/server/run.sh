@@ -1,1 +1,1 @@
-export GOMAXPROC=1 && go run ./main.go
+GOMAXPROCS=1 && go run ./main.go

@@ -2,9 +2,11 @@ package kafka
 
 import (
 	"errors"
-	"time"
 	"os"
 	"strings"
+	"time"
+
+	"github.com/segmentio/kafka-go"
 )
 
 var Topics = map[string]string{
@@ -17,6 +19,7 @@ type KafkaSettings struct {
 	Brokers []string
 	BatchTimeout time.Duration
 	BatchSize int
+	RequiredAcks  kafka.RequiredAcks
 }
 
 func LoadKafkaSettings() (KafkaSettings, error) {
@@ -29,6 +32,6 @@ func LoadKafkaSettings() (KafkaSettings, error) {
 		Brokers: strings.Split(brokers, ","),
 		BatchTimeout: 100 * time.Millisecond,
 		BatchSize: 1000,
-		
+		RequiredAcks: kafka.RequireAll,
 	}, nil
 }

@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"time"
 
 	"github.com/nopilei/events/src/schema"
 	kafkago "github.com/segmentio/kafka-go"
@@ -16,7 +15,7 @@ type KafkaProducer struct {
 
 var defaultProducer *KafkaProducer
 
-func Send(ctx context.Context, data *schema.BaseEventData, timeout time.Duration) error {
+func Send(ctx context.Context, data *schema.BaseEventData) error {
 	if defaultProducer == nil {
 		return ErrProducerNotInitialized
 	}
@@ -36,8 +35,6 @@ func Send(ctx context.Context, data *schema.BaseEventData, timeout time.Duration
 		Value: rawData,
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, timeout)
-	defer cancel()
 	return defaultProducer.writer.WriteMessages(ctx, kafkaMessage)
 }
 
@@ -54,8 +51,9 @@ func InitProducer() error {
 			Addr:         kafkago.TCP(settings.Brokers...),
 			BatchTimeout: settings.BatchTimeout,
             BatchSize: settings.BatchSize,
+            RequiredAcks: settings.RequiredAcks,
             AllowAutoTopicCreation: true,
-            Async: true,
+
 		},
 	}
 	return nil

@@ -1,10 +1,11 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/nopilei/events/src/schema"
 	"github.com/nopilei/events/src/transport/kafka"
@@ -37,8 +38,8 @@ func SendEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-	if err := kafka.Send(r.Context(), event, 5 * time.Second); err != nil{
-		WriteJSONError(w, err, http.StatusInternalServerError)
+	if err := kafka.Send(context.Background(), event); err != nil{
+		WriteJSONError(w, errors.Join(err, kafka.ErrKafkaSendFailed), http.StatusInternalServerError)
 		return
 	}
 	
