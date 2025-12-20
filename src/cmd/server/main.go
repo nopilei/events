@@ -5,14 +5,15 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/nopilei/events/src/transport/kafka"
 	"github.com/nopilei/events/src/api"
+	"github.com/nopilei/events/src/transport/kafka"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
 	prometheus.MustRegister(api.HttpRequests)
+	prometheus.MustRegister(api.HttpDuration)
 
 	err := kafka.InitProducer()
 	if err != nil {
@@ -27,6 +28,7 @@ func main() {
 
 	port := os.Getenv("API_PORT")
 	fmt.Println("starting server at", port)
+
 	err = http.ListenAndServe(":"+port, mux)
 	if err != nil {
 		fmt.Printf("%v", err)

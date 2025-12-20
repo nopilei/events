@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/nopilei/events/src/schema"
 	"github.com/nopilei/events/src/transport/kafka"
@@ -14,6 +15,11 @@ import (
 
 func SendEvent(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
+	timeStart := time.Now()
+	defer func() {
+		duration := time.Since(timeStart).Seconds()
+		HttpDuration.WithLabelValues(r.Method, r.Pattern, "200").Observe(duration)
+	}()
 
 	event := &schema.BaseEventData{}
 	if err := json.NewDecoder(r.Body).Decode(event); err != nil{
