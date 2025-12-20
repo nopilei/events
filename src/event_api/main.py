@@ -53,3 +53,4 @@ async def send_event(event: BaseEventData, producer: Annotated[AsyncProducer, De
     except BrokerError as e:
         logger.error(f"Kafka error: {e}")
         raise HTTPException(status_code=500, detail="Failed to send event")
+    

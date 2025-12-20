@@ -1,1 +1,1 @@
-export PYTHONPATH=$PYTHONPATH:/app && python -m uvicorn main:app --reload --workers=1 --host 0.0.0.0 --port 8000
+export PYTHONPATH=$PYTHONPATH:/app && python -m uvicorn main:app --workers=1 --log-level=error --host 0.0.0.0 --port 8000
